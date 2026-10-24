@@ -1,6 +1,6 @@
 # Mail Forward and Archive
 
-A macOS Shortcut, written in AppleScript, that does three things in one step for whatever messages you've selected in **Apple Mail**:
+An AppleScript for **Apple Mail**, run from a macOS Shortcut or a Hammerspoon hotkey, that does three things in one step for whatever messages you've selected:
 
 1. **Archives** them out of the Inbox, using Mail's own Archive command.
 2. **Forwards** each one, with its full original content, to an address you choose.
@@ -14,6 +14,7 @@ It was built for a Gmail account in Apple Mail, where the obvious AppleScript ap
 
 - [Requirements](#requirements)
 - [Setup](#setup)
+- [Option B: Hammerspoon hotkey](#option-b-hammerspoon-hotkey)
 - [Usage](#usage)
 - [Reading the log](#reading-the-log)
 - [How it works](#how-it-works)
@@ -27,9 +28,9 @@ It was built for a Gmail account in Apple Mail, where the obvious AppleScript ap
 
 ## Requirements
 
-- macOS with **Apple Mail** and **Shortcuts**.
+- macOS with **Apple Mail**, plus either **Shortcuts** (built in) or **[Hammerspoon](https://www.hammerspoon.org/)** (free) to launch the script.
 - A Gmail (IMAP) account set up in Mail. Other IMAP accounts will probably work, but they haven't been tested.
-- Permission for Shortcuts to send keystrokes (Accessibility). Setup step 4 covers this.
+- Accessibility permission for whichever launcher you use, so it can send keystrokes. The setup steps cover this.
 
 ---
 
@@ -60,7 +61,9 @@ property destAddress : "destination@example.com" -- where to forward
 
 `acctName` must match the account's **Description** in *Mail → Settings → Accounts*. That's often, but not always, the email address. It's used only for the verification step. If you're unsure, run `tools/list-mailboxes.applescript` in Script Editor to see the exact account names.
 
-### 4. Create the Shortcut
+### 4. Create the Shortcut (Option A)
+
+To use Hammerspoon instead, skip this step and go to [Option B](#option-b-hammerspoon-hotkey).
 
 1. Open **Shortcuts**, create a new shortcut, and name it something like *Forward and Archive*.
 2. Add a **Run AppleScript** action.
@@ -75,12 +78,81 @@ Grant permissions on the first run:
 
 ---
 
+## Option B: Hammerspoon hotkey
+
+[Hammerspoon](https://www.hammerspoon.org/) is a free macOS automation tool scripted in Lua. Use it instead of Shortcuts if you want a global hotkey that doesn't depend on the Shortcuts app or its permission prompts. It runs the **same** AppleScript.
+
+Complete setup steps 1–2 (Gmail label and Mail's Archive behavior) first. You can skip step 3, because the installer fills in your addresses.
+
+### Automatic install
+
+From the repository folder:
+
+```bash
+./hammerspoon/install.sh
+```
+
+The installer:
+
+1. Installs Hammerspoon with Homebrew (`brew install --cask hammerspoon`) if it isn't already installed.
+2. Prompts for your Mail account Description (`acctName`) and the forward-to address (`destAddress`).
+3. Copies a configured copy of the AppleScript and the Lua module into `~/.hammerspoon/`. Any existing copies are backed up as `.bak`.
+4. Adds `require("forward-and-archive")` to `~/.hammerspoon/init.lua`, if it isn't already there.
+5. Launches Hammerspoon.
+
+To run it non-interactively:
+
+```bash
+ACCT_NAME="you@gmail.com" DEST_ADDRESS="destination@example.com" ./hammerspoon/install.sh
+```
+
+### Manual install
+
+1. Install Hammerspoon: `brew install --cask hammerspoon`, or download it from hammerspoon.org.
+2. Copy `src/forward-and-archive.applescript` to `~/.hammerspoon/` and edit the two properties at the top.
+3. Copy `hammerspoon/forward-and-archive.lua` to `~/.hammerspoon/`.
+4. Add this line to `~/.hammerspoon/init.lua`:
+   ```lua
+   require("forward-and-archive")
+   ```
+
+### After installing
+
+1. **System Settings → Privacy & Security → Accessibility:** enable **Hammerspoon**.
+2. Optional: in Hammerspoon's **Preferences**, turn on **Launch Hammerspoon at login**.
+3. Click the Hammerspoon menu-bar icon and choose **Reload Config**.
+4. In Mail, select messages in the Inbox and press **⌃⌥⌘F** (Control-Option-Command-F).
+5. On the first run, allow control of **Mail** and **System Events** when prompted. If you missed the prompt, enable it under **Privacy & Security → Automation**.
+
+The hotkey only acts when Mail is the frontmost app. Otherwise it shows an alert and does nothing. The result dialog and clipboard log are the same as with Shortcuts.
+
+### Changing the hotkey
+
+Edit the configuration block in `~/.hammerspoon/forward-and-archive.lua` and reload the config:
+
+```lua
+M.mods = { "ctrl", "alt", "cmd" }
+M.key  = "F"
+```
+
+Release the hotkey promptly after pressing it. The script sends ⌃⌘A about half a second later, and modifier keys still held down could combine with it.
+
+### Updating
+
+After pulling a new version of the repository, re-run `./hammerspoon/install.sh`. It overwrites the installed copies, keeping `.bak` backups, and leaves `init.lua` alone if it's already set up.
+
+### Uninstalling
+
+Remove the `require("forward-and-archive")` line from `~/.hammerspoon/init.lua`, delete `~/.hammerspoon/forward-and-archive.*`, and reload the config.
+
+---
+
 ## Usage
 
 1. In Mail, click the account's **Inbox** in the sidebar, not All Mail or a smart mailbox.
 2. Click a message in the list so keyboard focus is on the message list.
 3. Select one or more messages (⌘-click or ⇧-click).
-4. Run the shortcut.
+4. Run the shortcut, or press the Hammerspoon hotkey (⌃⌥⌘F by default).
 
 A dialog shows the log, which is also copied to the clipboard.
 
@@ -166,6 +238,12 @@ Mail didn't come to the front in time. Click into Mail's message list before run
 **`forward FAILED: …`**
 Check that the account can send mail and that `destAddress` is correct.
 
+**Hammerspoon hotkey does nothing**
+Make sure Mail is the frontmost app and that the config loaded: the Hammerspoon Console should show no errors after **Reload Config**. Check that `~/.hammerspoon/init.lua` contains `require("forward-and-archive")`, and that no other app has claimed the same hotkey.
+
+**Hammerspoon: `Forward and Archive failed — see Hammerspoon Console`**
+Open the Console from the Hammerspoon menu-bar icon. The osascript error is printed there. "Not allowed to send keystrokes" means Accessibility isn't enabled for Hammerspoon. "Not authorized to send Apple events" means the Automation permission was denied.
+
 **Mail quit unexpectedly**
 Make sure you're running the current script. Earlier experimental versions that set `deleted status` crash Mail. The current version starts its log with `Selected:` followed by `Archive keystroke sent`.
 
@@ -173,6 +251,7 @@ Make sure you're running the current script. Earlier experimental versions that 
 
 ## Limitations
 
+- **Hammerspoon launcher is new.** The AppleScript is the tested version, but the Hammerspoon launcher hasn't been run end-to-end yet. Please report any problems.
 - **UI-dependent.** Archiving relies on a simulated ⌃⌘A, so Mail must be able to come to the front, and focus must be on the message list.
 - **One account is verified.** Forwarding and archiving work for any selected messages, but verification only checks the Inbox of `acctName`.
 - **No deduplication.** Re-running forwards again.
@@ -186,8 +265,11 @@ Make sure you're running the current script. Earlier experimental versions that 
 mail-forward-and-archive/
 ├── README.md
 ├── LICENSE
+├── hammerspoon/
+│   ├── forward-and-archive.lua           # Hammerspoon hotkey module
+│   └── install.sh                        # installs Hammerspoon + hotkey
 ├── src/
-│   └── forward-and-archive.applescript   # paste into a Shortcuts "Run AppleScript" action
+│   └── forward-and-archive.applescript   # Shortcuts "Run AppleScript" action, or run by Hammerspoon
 └── tools/
     └── list-mailboxes.applescript        # diagnostic: list account and mailbox names
 ```
