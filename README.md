@@ -1,5 +1,7 @@
 # Mail Forward and Archive
 
+<img src="src/applescript-icon-mac-intel.png" alt="AppleScript" width="32" height="32">
+
 An AppleScript for **Apple Mail**, run from a macOS Shortcut or a Hammerspoon hotkey, that does three things in one step for whatever messages you've selected:
 
 1. **Archives** them out of the Inbox, using Mail's own Archive command.
@@ -14,7 +16,7 @@ It was built for a Gmail account in Apple Mail, where the obvious AppleScript ap
 
 - [Requirements](#requirements)
 - [Setup](#setup)
-- [Option B: Hammerspoon hotkey](#option-b-hammerspoon-hotkey)
+- [Option B: Hammerspoon hotkey](#6-option-b-hammerspoon-hotkey)
 - [Usage](#usage)
 - [Reading the log](#reading-the-log)
 - [How it works](#how-it-works)
@@ -49,13 +51,15 @@ The script archives into a normal Gmail label named `NewArchived`. Create that l
 
 `NewArchived` should now appear in the sidebar label list. If **Create new label** is not in the sidebar, use **Settings** (the gear) → **See all settings** → **Labels** → **Create new label**, then use the same name.
 
-You can instead create it from Apple Mail with **Mailbox → New Mailbox**, choosing your Gmail account as the **Location**. Don't put it under *On My Mac*. After either method, confirm the label is visible in Gmail on the web, then in Mail choose **Mailbox → Get All New Mail** so the new label is available in step 2.
+You can instead create it from Apple Mail with **Mailbox → New Mailbox**, choosing your Gmail account as the **Location**. Don't put it under _On My Mac_.
 
-> **Why not Gmail's built-in archive?** Mail's default "Archive" mailbox for Gmail is mapped to *All Mail*, and moves into All Mail don't reliably remove the Inbox label. A real label behaves like an ordinary folder.
+After either method, confirm the label is visible in Gmail on the web, then in Apple Mail choose **Mailbox → Get All New Mail** so the new label is available in step 2.
+
+> **Why not Gmail's built-in archive?** Mail's default "Archive" mailbox for Gmail is mapped to _All Mail_, and moves into All Mail don't reliably remove the Inbox label. A real label behaves like an ordinary folder.
 
 ### 2. Point Mail's Archive behavior at that label
 
-**Mail → Settings → Accounts →** *(your Gmail account)* **→ Mailbox Behaviors → Archive Mailbox:** choose the label from step 1.
+**Mail → Settings → Accounts →** _(your Gmail account)_ **→ Mailbox Behaviors → Archive Mailbox:** choose the label from step 1.
 
 After this, ⌃⌘A, whether you press it or the script does, files messages into your label.
 
@@ -68,13 +72,20 @@ property acctName : "you@gmail.com"              -- account Description in Mail
 property destAddress : "destination@example.com" -- where to forward
 ```
 
-`acctName` must match the account's **Description** in *Mail → Settings → Accounts*. That's often, but not always, the email address. It's used only for the verification step. If you're unsure, run `tools/list-mailboxes.applescript` in Script Editor to see the exact account names.
+`acctName` must match the account's **Description** in _Mail → Settings → Accounts_. That's often, but not always, the email address. It's used only for the verification step. If you're unsure, run `tools/list-mailboxes.applescript` in Script Editor to see the exact account names.
 
-### 4. Create the Shortcut (Option A)
+### 4. Run the script
 
-To use Hammerspoon instead, skip this step and go to [Option B](#option-b-hammerspoon-hotkey).
+There are two ways to run `src/forward-and-archive.applescript` on messages you have selected in the Inbox of the Mail account named by `acctName`. Hold ⌘ and click to select more than one message.
 
-1. Open **Shortcuts**, create a new shortcut, and name it something like *Forward and Archive*.
+- **Option A.** A shortcut in the Shortcuts app. Continue with step 5.
+- **Option B.** A Hammerspoon hotkey. Skip to [step 6](#6-option-b-hammerspoon-hotkey).
+
+### 5. Option A: Create a Shortcut
+
+To use Hammerspoon instead, skip this step and go to [Option B](#6-option-b-hammerspoon-hotkey).
+
+1. Open **Shortcuts**, create a new shortcut, and name it something like _Forward and Archive_.
 2. Add a **Run AppleScript** action.
 3. Replace its entire contents with the configured script from step 3.
 4. Optional: in the shortcut's details, turn on **Pin in Menu Bar** and/or assign a **keyboard shortcut**.
@@ -87,7 +98,7 @@ Grant permissions on the first run:
 
 ---
 
-## Option B: Hammerspoon hotkey
+## 6. Option B: Hammerspoon hotkey
 
 [Hammerspoon](https://www.hammerspoon.org/) is a free macOS automation tool scripted in Lua. Use it instead of Shortcuts if you want a global hotkey that doesn't depend on the Shortcuts app or its permission prompts. It runs the **same** AppleScript.
 
@@ -122,7 +133,7 @@ ACCT_NAME="you@gmail.com" DEST_ADDRESS="destination@example.com" ./hammerspoon/i
 3. Copy `hammerspoon/forward-and-archive.lua` to `~/.hammerspoon/`.
 4. Add this line to `~/.hammerspoon/init.lua`:
    ```lua
-   require("forward-and-archive")
+    require("forward-and-archive")
    ```
 
 ### After installing
@@ -186,22 +197,22 @@ Archive keystroke sent (frontmost: Mail)
 Out of Inbox: 6 of 6
 ```
 
-| Line | Meaning |
-|---|---|
-| `Selected: N message(s)` | What Mail reported as selected. |
-| `Archive keystroke sent (frontmost: Mail)` | ⌃⌘A was sent while Mail was frontmost. If another app is named, the keystroke went to the wrong place. |
-| `• <subject>` | The message's **subject line**. Job digests often use the first listing as the subject, but the whole message is forwarded. |
-| `forwarded: OK` | The forward was created and sent. |
-| `Out of Inbox: X of N` | Messages confirmed gone from the Inbox after up to 10 seconds. Any error during this check counts as *still in Inbox*, so a failure can't be reported as success. |
-| `STILL IN INBOX: <message-id>` | That message didn't leave the Inbox. See [Troubleshooting](#troubleshooting). |
+| Line                                       | Meaning                                                                                                                                                           |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Selected: N message(s)`                   | What Mail reported as selected.                                                                                                                                   |
+| `Archive keystroke sent (frontmost: Mail)` | ⌃⌘A was sent while Mail was frontmost. If another app is named, the keystroke went to the wrong place.                                                            |
+| `• <subject>`                              | The message's **subject line**. Job digests often use the first listing as the subject, but the whole message is forwarded.                                       |
+| `forwarded: OK`                            | The forward was created and sent.                                                                                                                                 |
+| `Out of Inbox: X of N`                     | Messages confirmed gone from the Inbox after up to 10 seconds. Any error during this check counts as _still in Inbox_, so a failure can't be reported as success. |
+| `STILL IN INBOX: <message-id>`             | That message didn't leave the Inbox. See [Troubleshooting](#troubleshooting).                                                                                     |
 
 ---
 
 ## How it works
 
 1. **Capture.** Read Mail's selection and store a reference and Message-ID for each message. This doesn't move keyboard focus.
-2. **Archive first.** Bring Mail to the front, wait until it's actually frontmost, and send ⌃⌘A. This has to happen *before* forwarding, because sending a forward moves focus away from the message list and the keystroke would then do nothing.
-3. **Forward.** Forward each stored message, without opening a window, to `destAddress`. The references stay valid after archiving because Mail tends to hand the script the *All Mail* copy of a Gmail message, which archiving doesn't remove.
+2. **Archive first.** Bring Mail to the front, wait until it's actually frontmost, and send ⌃⌘A. This has to happen _before_ forwarding, because sending a forward moves focus away from the message list and the keystroke would then do nothing.
+3. **Forward.** Forward each stored message, without opening a window, to `destAddress`. The references stay valid after archiving because Mail tends to hand the script the _All Mail_ copy of a Gmail message, which archiving doesn't remove.
 4. **Verify.** Poll the account's `INBOX` for each Message-ID for up to 10 seconds total.
 
 ---
@@ -210,16 +221,16 @@ Out of Inbox: 6 of 6
 
 This design came out of a long round of trial and error. If you want to adapt the script, here's what **didn't** work with Gmail in Apple Mail:
 
-| Approach | Result |
-|---|---|
-| `move msg to mailbox "Archived"` | Error -1728. Gmail has no such folder unless you create the label. |
-| `move msg to` Mail's "Archive" mailbox (mapped to All Mail) | Reported OK, but the message stayed in the Inbox. |
-| Deciding "already archived" from `mailbox of msg` | Unreliable. Mail often returns the **All Mail** copy even when you selected the message in the Inbox. |
-| Finding the Inbox copy by Message-ID and `move`-ing it to a real label | The label was added, but the Inbox copy stayed. With Gmail, an AppleScript `move` behaves like a **copy**. Turning on Gmail's IMAP Auto-Expunge didn't change this. |
-| `set deleted status of msg to true` | **Crashed Mail.** Every later command failed with -609, "Connection is invalid". |
-| Clicking *Message → Archive* via System Events | Unreliable. The menu item may be missing or disabled for the selection, and clicking a disabled item fails silently. |
-| Sending ⌃⌘A *after* forwarding | Did nothing. Focus had left the message list. |
-| **Sending ⌃⌘A *before* forwarding, with Archive pointed at a real label** | ✅ Works for one or many messages. |
+| Approach                                                                  | Result                                                                                                                                                              |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `move msg to mailbox "Archived"`                                          | Error -1728. Gmail has no such folder unless you create the label.                                                                                                  |
+| `move msg to` Mail's "Archive" mailbox (mapped to All Mail)               | Reported OK, but the message stayed in the Inbox.                                                                                                                   |
+| Deciding "already archived" from `mailbox of msg`                         | Unreliable. Mail often returns the **All Mail** copy even when you selected the message in the Inbox.                                                               |
+| Finding the Inbox copy by Message-ID and `move`-ing it to a real label    | The label was added, but the Inbox copy stayed. With Gmail, an AppleScript `move` behaves like a **copy**. Turning on Gmail's IMAP Auto-Expunge didn't change this. |
+| `set deleted status of msg to true`                                       | **Crashed Mail.** Every later command failed with -609, "Connection is invalid".                                                                                    |
+| Clicking _Message → Archive_ via System Events                            | Unreliable. The menu item may be missing or disabled for the selection, and clicking a disabled item fails silently.                                                |
+| Sending ⌃⌘A _after_ forwarding                                            | Did nothing. Focus had left the message list.                                                                                                                       |
+| **Sending ⌃⌘A _before_ forwarding, with Archive pointed at a real label** | ✅ Works for one or many messages.                                                                                                                                  |
 
 Two other AppleScript pitfalls came up along the way:
 
@@ -230,27 +241,28 @@ Two other AppleScript pitfalls came up along the way:
 
 ## Troubleshooting
 
-**`Archive keystroke FAILED: Shortcuts is not allowed to send keystrokes. (1002)`**
-Grant Accessibility access (setup step 4). If it's already on, remove Shortcuts from the list with **−**, add it back, and relaunch Shortcuts.
+`Archive keystroke FAILED: Shortcuts is not allowed to send keystrokes. (1002)`
+Grant Accessibility access (step 5). If it's already on, remove Shortcuts from the list with **−**, add it back, and relaunch Shortcuts.
 
-**`Archive keystroke sent (frontmost: <something other than Mail>)`**
+`Archive keystroke sent (frontmost: <something other than Mail>)`
 Mail didn't come to the front in time. Click into Mail's message list before running. If it keeps happening, increase the `delay 0.5` after the frontmost loop.
 
-**`STILL IN INBOX` even though the keystroke was sent**
+`STILL IN INBOX` **even though the keystroke was sent**
+
 - Make sure you selected the messages in the account's **Inbox**, with focus on the message list.
-- Press ⌃⌘A yourself on the same message. If that doesn't archive it either, it's a Mail or Gmail problem, not the script. Check *Mailbox Behaviors* (setup step 2).
+- Press ⌃⌘A yourself on the same message. If that doesn't archive it either, it's a Mail or Gmail problem, not the script. Check _Mailbox Behaviors_ (setup step 2).
 - Force a refresh with **Mailbox → Get All New Mail**, or **Take All Accounts Offline** and then **Online**, and compare with Gmail on the web.
 
-**`Verify FAILED: Mail got an error: Can't get mailbox "INBOX" of account …`**
+`Verify FAILED: Mail got an error: Can't get mailbox "INBOX" of account …`
 `acctName` doesn't match the account's Description in Mail. Run `tools/list-mailboxes.applescript` to see the exact name.
 
-**`forward FAILED: …`**
+`forward FAILED: …`
 Check that the account can send mail and that `destAddress` is correct.
 
 **Hammerspoon hotkey does nothing**
 Make sure Mail is the frontmost app and that the config loaded: the Hammerspoon Console should show no errors after **Reload Config**. Check that `~/.hammerspoon/init.lua` contains `require("forward-and-archive")`, and that no other app has claimed the same hotkey.
 
-**Hammerspoon: `Forward and Archive failed — see Hammerspoon Console`**
+**Hammerspoon:** `Forward and Archive failed — see Hammerspoon Console`
 Open the Console from the Hammerspoon menu-bar icon. The osascript error is printed there. "Not allowed to send keystrokes" means Accessibility isn't enabled for Hammerspoon. "Not authorized to send Apple events" means the Automation permission was denied.
 
 **Mail quit unexpectedly**

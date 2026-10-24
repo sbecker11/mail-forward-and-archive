@@ -10,9 +10,9 @@
 -- ===== CONFIGURATION =====
 -- acctName: the account's Description in Mail > Settings > Accounts
 --           (often the email address, but not always). Used only for verification.
-property acctName : "you@gmail.com"
+property acctName : "scbboston@gmail.com"
 -- destAddress: where selected messages are forwarded.
-property destAddress : "destination@example.com"
+property destAddress : "shawnbecker.recruiting@gmail.com"
 -- ==========================
 
 on run {input, parameters}
