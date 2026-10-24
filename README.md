@@ -18,7 +18,18 @@ It was built for a Gmail account in Apple Mail, where the obvious AppleScript ap
 
 - [Requirements](#requirements)
 - [Setup](#setup)
-- [Option B: Hammerspoon hotkey](#6-option-b-hammerspoon-hotkey)
+  - [Create the NewArchived label in Gmail on the web](#create-the-newarchived-label-in-gmail-on-the-web)
+  - [Point Mail's Archive behavior at that label](#point-mails-archive-behavior-at-that-label)
+  - [Configure the script](#configure-the-script)
+  - [Run the script](#run-the-script)
+- [Option A: Set up an Apple Shortcut](#option-a-set-up-an-apple-shortcut)
+- [Option B: Set up a Hammerspoon hotkey](#option-b-set-up-a-hammerspoon-hotkey)
+  - [Automatic install](#automatic-install)
+  - [Manual install](#manual-install)
+  - [After installing](#after-installing)
+  - [Changing the hotkey](#changing-the-hotkey)
+  - [Updating](#updating)
+  - [Uninstalling](#uninstalling)
 - [Usage](#usage)
 - [Reading the log](#reading-the-log)
 - [How it works](#how-it-works)
@@ -34,13 +45,13 @@ It was built for a Gmail account in Apple Mail, where the obvious AppleScript ap
 
 - macOS with **Apple Mail**, plus either **Shortcuts** (built in) or **[Hammerspoon](https://www.hammerspoon.org/)** (free) to launch the script.
 - A Gmail (IMAP) account set up in Mail. Other IMAP accounts will probably work, but they haven't been tested.
-- Accessibility permission for whichever launcher you use, so it can send keystrokes. The setup steps cover this.
+- Accessibility permission for whichever launcher you use, so it can send keystrokes. The setup sections cover this.
 
 ---
 
 ## Setup
 
-### 1. Create the `NewArchived` label in Gmail on the web
+### Create the `NewArchived` label in Gmail on the web
 
 The script archives into a normal Gmail label named `NewArchived`. Create that label in Gmail before you point Mail at it:
 
@@ -55,17 +66,17 @@ The script archives into a normal Gmail label named `NewArchived`. Create that l
 
 You can instead create it from Apple Mail with **Mailbox → New Mailbox**, choosing your Gmail account as the **Location**. Don't put it under _On My Mac_.
 
-After either method, confirm the label is visible in Gmail on the web, then in Apple Mail choose **Mailbox → Get All New Mail** so the new label is available in step 2.
+After either method, confirm the label is visible in Gmail on the web, then in Apple Mail choose **Mailbox → Get All New Mail** so the new label is available when you [point Mail's Archive behavior at that label](#point-mails-archive-behavior-at-that-label).
 
 > **Why not Gmail's built-in archive?** Mail's default "Archive" mailbox for Gmail is mapped to _All Mail_, and moves into All Mail don't reliably remove the Inbox label. A real label behaves like an ordinary folder.
 
-### 2. Point Mail's Archive behavior at that label
+### Point Mail's Archive behavior at that label
 
-**Mail → Settings → Accounts →** _(your Gmail account)_ **→ Mailbox Behaviors → Archive Mailbox:** choose the label from step 1.
+**Mail → Settings → Accounts →** _(your Gmail account)_ **→ Mailbox Behaviors → Archive Mailbox:** choose the `NewArchived` label.
 
 After this, ⌃⌘A, whether you press it or the script does, files messages into your label.
 
-### 3. Configure the script
+### Configure the script
 
 Open `src/forward-and-archive.applescript` and edit the two properties at the top:
 
@@ -76,20 +87,22 @@ property destAddress : "destination@example.com" -- where to forward
 
 `acctName` must match the account's **Description** in _Mail → Settings → Accounts_. That's often, but not always, the email address. It's used only for the verification step. If you're unsure, run `tools/list-mailboxes.applescript` in Script Editor to see the exact account names.
 
-### 4. Run the script
+### Run the script
 
 There are two ways to run `src/forward-and-archive.applescript` on messages you have selected in the Inbox of the Mail account named by `acctName`. Hold ⌘ and click to select more than one message.
 
-- **Option A.** A shortcut in the Shortcuts app. Continue with step 5.
-- **Option B.** A Hammerspoon hotkey. Skip to [step 6](#6-option-b-hammerspoon-hotkey).
+- **Option A.** A shortcut in the Shortcuts app. Continue with [Option A](#option-a-set-up-an-apple-shortcut).
+- **Option B.** A Hammerspoon hotkey. Skip to [Option B](#option-b-set-up-a-hammerspoon-hotkey).
 
-### 5. Option A: Create an Apple Shortcut
+---
 
-To use Hammerspoon instead, skip this step and go to [Option B](#6-option-b-hammerspoon-hotkey).
+## Option A: Set up an Apple Shortcut
+
+To use Hammerspoon instead, skip this section and go to [Option B](#option-b-set-up-a-hammerspoon-hotkey).
 
 1. Open **Shortcuts**, create a new shortcut, and name it something like _Forward and Archive_.
 2. Add a **Run AppleScript** action.
-3. Replace its entire contents with the configured script from step 3.
+3. Replace its entire contents with the configured script from [Configure the script](#configure-the-script).
 4. Optional: in the shortcut's details, turn on **Pin in Menu Bar** and/or assign a **keyboard shortcut**.
 
 Grant permissions on the first run:
@@ -100,11 +113,11 @@ Grant permissions on the first run:
 
 ---
 
-## 6. Option B: Hammerspoon hotkey
+## Option B: Set up a Hammerspoon hotkey
 
 [Hammerspoon](https://www.hammerspoon.org/) is a free macOS automation tool scripted in Lua. Use it instead of Shortcuts if you want a global hotkey that doesn't depend on the Shortcuts app or its permission prompts. It runs the **same** AppleScript.
 
-Complete setup steps 1–2 (Gmail label and Mail's Archive behavior) first. You can skip step 3, because the installer fills in your addresses.
+Complete [Create the NewArchived label in Gmail on the web](#create-the-newarchived-label-in-gmail-on-the-web) and [Point Mail's Archive behavior at that label](#point-mails-archive-behavior-at-that-label) first. You can skip [Configure the script](#configure-the-script), because the installer fills in your addresses.
 
 ### Automatic install
 
@@ -135,7 +148,7 @@ ACCT_NAME="you@gmail.com" DEST_ADDRESS="destination@example.com" ./hammerspoon/i
 3. Copy `hammerspoon/forward-and-archive.lua` to `~/.hammerspoon/`.
 4. Add this line to `~/.hammerspoon/init.lua`:
    ```lua
-    require("forward-and-archive")
+   require("forward-and-archive")
    ```
 
 ### After installing
@@ -244,7 +257,7 @@ Two other AppleScript pitfalls came up along the way:
 ## Troubleshooting
 
 `Archive keystroke FAILED: Shortcuts is not allowed to send keystrokes. (1002)`
-Grant Accessibility access (step 5). If it's already on, remove Shortcuts from the list with **−**, add it back, and relaunch Shortcuts.
+Grant Accessibility access under [Option A](#option-a-set-up-an-apple-shortcut). If it's already on, remove Shortcuts from the list with **−**, add it back, and relaunch Shortcuts.
 
 `Archive keystroke sent (frontmost: <something other than Mail>)`
 Mail didn't come to the front in time. Click into Mail's message list before running. If it keeps happening, increase the `delay 0.5` after the frontmost loop.
@@ -252,7 +265,7 @@ Mail didn't come to the front in time. Click into Mail's message list before run
 `STILL IN INBOX` **even though the keystroke was sent**
 
 - Make sure you selected the messages in the account's **Inbox**, with focus on the message list.
-- Press ⌃⌘A yourself on the same message. If that doesn't archive it either, it's a Mail or Gmail problem, not the script. Check _Mailbox Behaviors_ (setup step 2).
+- Press ⌃⌘A yourself on the same message. If that doesn't archive it either, it's a Mail or Gmail problem, not the script. Check _Mailbox Behaviors_ under [Point Mail's Archive behavior at that label](#point-mails-archive-behavior-at-that-label).
 - Force a refresh with **Mailbox → Get All New Mail**, or **Take All Accounts Offline** and then **Online**, and compare with Gmail on the web.
 
 `Verify FAILED: Mail got an error: Can't get mailbox "INBOX" of account …`
