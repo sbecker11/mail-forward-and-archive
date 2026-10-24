@@ -36,11 +36,20 @@ It was built for a Gmail account in Apple Mail, where the obvious AppleScript ap
 
 ## Setup
 
-### 1. Create an archive label in Gmail
+### 1. Create the `NewArchived` label in Gmail on the web
 
-Create a regular Gmail label to hold archived messages, for example `NewArchived`. You can do this in Gmail on the web, or in Mail with **Mailbox → New Mailbox**, choosing your Gmail account as the **Location**. Don't put it under *On My Mac*.
+The script archives into a normal Gmail label named `NewArchived`. Create that label in Gmail before you point Mail at it:
 
-Check that the label appears in Gmail's label list on the web.
+1. Open [Gmail](https://mail.google.com) in a browser and sign in to the account you use in Apple Mail.
+2. In the left sidebar, scroll down and click **More** if the label list is collapsed.
+3. At the bottom of the label list, click **Create new label**.
+4. In **Please enter a new label name**, type `NewArchived`.
+5. Leave **Nest label under** unchecked, so the label is top-level.
+6. Click **Create**.
+
+`NewArchived` should now appear in the sidebar label list. If **Create new label** is not in the sidebar, use **Settings** (the gear) → **See all settings** → **Labels** → **Create new label**, then use the same name.
+
+You can instead create it from Apple Mail with **Mailbox → New Mailbox**, choosing your Gmail account as the **Location**. Don't put it under *On My Mac*. After either method, confirm the label is visible in Gmail on the web, then in Mail choose **Mailbox → Get All New Mail** so the new label is available in step 2.
 
 > **Why not Gmail's built-in archive?** Mail's default "Archive" mailbox for Gmail is mapped to *All Mail*, and moves into All Mail don't reliably remove the Inbox label. A real label behaves like an ordinary folder.
 
