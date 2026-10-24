@@ -81,7 +81,7 @@ There are two ways to run `src/forward-and-archive.applescript` on messages you 
 - **Option A.** A shortcut in the Shortcuts app. Continue with step 5.
 - **Option B.** A Hammerspoon hotkey. Skip to [step 6](#6-option-b-hammerspoon-hotkey).
 
-### 5. Option A: Create a Shortcut
+### 5. Option A: Create an Apple Shortcut
 
 To use Hammerspoon instead, skip this step and go to [Option B](#6-option-b-hammerspoon-hotkey).
 
