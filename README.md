@@ -2,9 +2,7 @@
 
 The AppleScript icon on each Mac:
 
-<img src="src/applescript-icon-mac-intel.png" alt="AppleScript icon on Mac Intel" width="32" height="32"> **Mac Intel**
-&nbsp;&nbsp;&nbsp;
-<img src="src/applescript-icon-mac-m4.png" alt="AppleScript icon on Mac M4" width="32" height="32"> **Mac M4**
+<p><img src="src/applescript-icon-mac-intel.png" alt="AppleScript icon on Mac Intel" width="32" height="32"> <strong>Mac Intel</strong>&nbsp;&nbsp;&nbsp;<img src="src/applescript-icon-mac-m4.png" alt="AppleScript icon on Mac M4" width="32" height="32"> <strong>Mac M4</strong></p>
 
 An AppleScript for **Apple Mail**, run from a macOS Shortcut or a Hammerspoon hotkey, that does three things in one step for whatever messages you've selected:
 
